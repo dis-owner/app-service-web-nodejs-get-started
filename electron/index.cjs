@@ -2,20 +2,8 @@
 
 const express = require('express');
 const path = require('path');
-const { app: electronApp, BrowserWindow, Tray, Menu, dialog, shell, clipboard } = require('electron');
 const http = require('http');
 const debug = require('debug')('nodejs-get-started:server');
-const isDev = require('electron-is-dev');
-const { autoUpdater } = require('electron-updater');
-
-let mainWindow;
-const instanceLock = electronApp.requestSingleInstanceLock();
-const isMacOS = process.platform === 'darwin';
-const PORT = isDev ? '5173' : '51735';
-const ICON = 'icon-rounded.png';
-const ICON_TEMPLATE = 'iconTemplate.png';
-
-if (require('electron-squirrel-startup')) electronApp.quit();
 
 // Expressアプリケーションの設定
 const serverApp = express();
@@ -78,183 +66,199 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-function createWindow() {
-  autoUpdater.checkForUpdatesAndNotify();
+// エレクトロン固有のコードはここから
+if (process.env.ELECTRON_RUN_AS_NODE === undefined) {
+  const { app: electronApp, BrowserWindow, Tray, Menu, dialog, shell, clipboard } = require('electron');
+  const isDev = require('electron-is-dev');
+  const { autoUpdater } = require('electron-updater');
 
-  mainWindow = new BrowserWindow({
-    autoHideMenuBar: true,
-    show: false,
-    icon: assetPath(ICON),
-  });
+  let mainWindow;
+  const instanceLock = electronApp.requestSingleInstanceLock();
+  const isMacOS = process.platform === 'darwin';
+  const PORT = process.env.PORT || (isDev ? '5173' : '51735');
+  const ICON = 'icon-rounded.png';
+  const ICON_TEMPLATE = 'iconTemplate.png';
 
-  createTray(mainWindow);
+  if (require('electron-squirrel-startup')) electronApp.quit();
 
-  mainWindow.maximize();
-  mainWindow.show();
+  function createWindow() {
+    autoUpdater.checkForUpdatesAndNotify();
 
-  mainWindow.loadURL(`http://localhost:${PORT}`);
+    mainWindow = new BrowserWindow({
+      autoHideMenuBar: true,
+      show: false,
+      icon: assetPath(ICON),
+    });
 
-  if (isDev) {
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
+    createTray(mainWindow);
+
+    mainWindow.maximize();
+    mainWindow.show();
+
+    mainWindow.loadURL(`http://localhost:${PORT}`);
+
+    if (isDev) {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    }
+
+    setupLinksLeftClick(mainWindow);
+    setupContextMenu(mainWindow);
+
+    return mainWindow;
   }
 
-  setupLinksLeftClick(mainWindow);
-  setupContextMenu(mainWindow);
+  const assetPath = (asset) => {
+    return path.join(__dirname, isDev ? `../public/${asset}` : `../dist/${asset}`);
+  };
 
-  return mainWindow;
-}
-
-const assetPath = (asset) => {
-  return path.join(__dirname, isDev ? `../public/${asset}` : `../dist/${asset}`);
-};
-
-const createTray = (win) => {
-  const tray = new Tray(assetPath(!isMacOS ? ICON : ICON_TEMPLATE));
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Show',
-      click: () => {
-        win.maximize();
-        win.show();
+  const createTray = (win) => {
+    const tray = new Tray(assetPath(!isMacOS ? ICON : ICON_TEMPLATE));
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Show',
+        click: () => {
+          win.maximize();
+          win.show();
+        },
       },
-    },
-    {
-      label: 'Exit',
-      click: () => {
-        electronApp.isQuiting = true;
-        electronApp.quit();
+      {
+        label: 'Exit',
+        click: () => {
+          electronApp.isQuiting = true;
+          electronApp.quit();
+        },
       },
-    },
-  ]);
+    ]);
 
-  tray.on('click', () => {
-    win.maximize();
-    win.show();
-  });
-  tray.setToolTip('Better ChatGPT');
-  tray.setContextMenu(contextMenu);
+    tray.on('click', () => {
+      win.maximize();
+      win.show();
+    });
+    tray.setToolTip('Better ChatGPT');
+    tray.setContextMenu(contextMenu);
 
-  return tray;
-};
+    return tray;
+  };
 
-const setupLinksLeftClick = (win) => {
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: 'deny' };
-  });
-};
+  const setupLinksLeftClick = (win) => {
+    win.webContents.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    });
+  };
 
-const setupContextMenu = (win) => {
-  win.webContents.on('context-menu', (_, params) => {
-    const { x, y, linkURL, selectionText } = params;
-    const template = [
-      { role: 'undo' },
-      { role: 'redo' },
-      { type: 'separator' },
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' },
-      { role: 'pasteAndMatchStyle' },
-      { role: 'delete' },
-      { type: 'separator' },
-      { role: 'selectAll' },
-      { type: 'separator' },
-      { role: 'toggleDevTools' },
-    ];
+  const setupContextMenu = (win) => {
+    win.webContents.on('context-menu', (_, params) => {
+      const { x, y, linkURL, selectionText } = params;
+      const template = [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'pasteAndMatchStyle' },
+        { role: 'delete' },
+        { type: 'separator' },
+        { role: 'selectAll' },
+        { type: 'separator' },
+        { role: 'toggleDevTools' },
+      ];
 
-    const spellingMenu = [];
+      const spellingMenu = [];
 
-    if (selectionText && !linkURL) {
-      for (const suggestion of params.dictionarySuggestions) {
-        spellingMenu.push(
-          new MenuItem({
-            label: suggestion,
-            click: () => win.webContents.replaceMisspelling(suggestion),
-          })
+      if (selectionText && !linkURL) {
+        for (const suggestion of params.dictionarySuggestions) {
+          spellingMenu.push(
+            new MenuItem({
+              label: suggestion,
+              click: () => win.webContents.replaceMisspelling(suggestion),
+            })
+          );
+        }
+        if (params.misspelledWord) {
+          spellingMenu.push(
+            new MenuItem({
+              label: 'Add to dictionary',
+              click: () => win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
+            })
+          );
+        }
+        if (spellingMenu.length > 0) {
+          spellingMenu.push({ type: 'separator' });
+        }
+        template.push(
+          { type: 'separator' },
+          {
+            label: `Search Google for "${selectionText}"`,
+            click: () => {
+              shell.openExternal(`https://www.google.com/search?q=${encodeURIComponent(selectionText)}`);
+            },
+          },
+          {
+            label: `Search DuckDuckGo for "${selectionText}"`,
+            click: () => {
+              shell.openExternal(`https://duckduckgo.com/?q=${encodeURIComponent(selectionText)}`);
+            },
+          }
         );
       }
-      if (params.misspelledWord) {
-        spellingMenu.push(
-          new MenuItem({
-            label: 'Add to dictionary',
-            click: () => win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
-          })
+
+      if (linkURL) {
+        template.push(
+          { type: 'separator' },
+          {
+            label: 'Open Link in Browser',
+            click: () => {
+              shell.openExternal(linkURL);
+            },
+          },
+          {
+            label: 'Copy Link Address',
+            click: () => {
+              clipboard.writeText(linkURL);
+            },
+          },
+          {
+            label: 'Save Link As...',
+            click: () => {
+              dialog.showSaveDialog(win, { defaultPath: path.basename(linkURL) }, (filePath) => {
+                if (filePath) {
+                  download(win, linkURL, { filename: filePath });
+                }
+              });
+            },
+          }
         );
       }
-      if (spellingMenu.length > 0) {
-        spellingMenu.push({ type: 'separator' });
-      }
-      template.push(
-        { type: 'separator' },
-        {
-          label: `Search Google for "${selectionText}"`,
-          click: () => {
-            shell.openExternal(`https://www.google.com/search?q=${encodeURIComponent(selectionText)}`);
-          },
-        },
-        {
-          label: `Search DuckDuckGo for "${selectionText}"`,
-          click: () => {
-            shell.openExternal(`https://duckduckgo.com/?q=${encodeURIComponent(selectionText)}`);
-          },
-        }
-      );
-    }
 
-    if (linkURL) {
-      template.push(
-        { type: 'separator' },
-        {
-          label: 'Open Link in Browser',
-          click: () => {
-            shell.openExternal(linkURL);
-          },
-        },
-        {
-          label: 'Copy Link Address',
-          click: () => {
-            clipboard.writeText(linkURL);
-          },
-        },
-        {
-          label: 'Save Link As...',
-          click: () => {
-            dialog.showSaveDialog(win, { defaultPath: path.basename(linkURL) }, (filePath) => {
-              if (filePath) {
-                download(win, linkURL, { filename: filePath });
-              }
-            });
-          },
-        }
-      );
-    }
+      Menu.buildFromTemplate([...spellingMenu, ...template]).popup({ window: win, x, y });
+    });
+  };
 
-    Menu.buildFromTemplate([...spellingMenu, ...template]).popup({ window: win, x, y });
+  electronApp.on('window-all-closed', () => {
+    if (!isMacOS) {
+      electronApp.quit();
+    }
   });
-};
 
-electronApp.on('window-all-closed', () => {
-  if (!isMacOS) {
+  process.on('uncaughtException', (error) => {
+    dialog.showErrorBox('An error occurred', error.stack);
+    process.exit(1);
+  });
+
+  if (!instanceLock) {
     electronApp.quit();
+  } else {
+    electronApp.on('second-instance', (event, commandLine, workingDirectory) => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+      }
+    });
+
+    electronApp.whenReady().then(() => {
+      mainWindow = createWindow();
+    });
   }
-});
-
-process.on('uncaughtException', (error) => {
-  dialog.showErrorBox('An error occurred', error.stack);
-  process.exit(1);
-});
-
-if (!instanceLock) {
-  electronApp.quit();
-} else {
-  electronApp.on('second-instance', (event, commandLine, workingDirectory) => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-  });
-
-  electronApp.whenReady().then(() => {
-    mainWindow = createWindow();
-  });
 }
