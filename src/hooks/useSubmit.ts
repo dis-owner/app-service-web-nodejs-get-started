@@ -71,6 +71,11 @@ const useSubmit = () => {
 
     try {
       let stream;
+      let currentChat = chats[currentChatIndex].messages
+      // citation プロパティを削除する
+      currentChat.forEach(item => {
+        delete item.citation;
+      });
       if (chats[currentChatIndex].messages.length === 0)
         throw new Error('No messages submitted!');
 
