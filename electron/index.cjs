@@ -20,7 +20,7 @@ if (isElectron) {
     mainWindow.loadURL(
       isDev
         ? 'http://localhost:3000'
-        : `file://${path.join(__dirname, '../build/index.html')}`
+        : `file://${path.join(__dirname, '../dist/index.html')}`
     );
 
     if (isDev) {
@@ -46,10 +46,10 @@ if (isElectron) {
   const app = express();
   const port = process.env.PORT || 3000;
 
-  app.use(express.static(path.join(__dirname, '../build')));
+  app.use(express.static(path.join(__dirname, '../dist')));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build/index.html'));
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
   });
 
   app.listen(port, () => {
