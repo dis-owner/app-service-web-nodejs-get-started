@@ -1,90 +1,244 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
+const path = require('path');
+const { app, shell, clipboard, dialog, download, BrowserWindow, Tray, Menu, MenuItem } = require('electron');
+const isDev = require('electron-is-dev');
+const { autoUpdater } = require('electron-updater');
+const express = require('express');
+const http = require('http');
+const fs = require('fs');
 
-var app = require('../app');
-var debug = require('debug')('nodejs-get-started:server');
-var http = require('http');
+const PORT = isDev ? '5173' : (process.env.PORT || '51735');
+const ICON = 'icon-rounded.png';
+const ICON_TEMPLATE = 'iconTemplate.png';
 
-/**
- * Get port from environment and store in Express.
- */
+// Expressサーバーの設定
+function createExpressServer() {
+  const expressApp = express();
+  const server = http.createServer(expressApp);
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+  expressApp.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
 
-/**
- * Create HTTP server.
- */
+  expressApp.use(express.static(path.join(__dirname, '../dist')));
 
-var server = http.createServer(app);
+  server.listen(PORT, () => {
+    console.log(`Express server listening on http://localhost:${PORT}/`);
+  });
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
+  return expressApp;
 }
 
-/**
- * Event listener for HTTP server "error" event.
- */
+// エレクトロンの設定
+function createElectronWindow() {
+  autoUpdater.checkForUpdatesAndNotify();
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
+  let win = new BrowserWindow({
+    autoHideMenuBar: true,
+    show: false,
+    icon: assetPath(ICON),
+  });
+
+  createTray(win);
+
+  win.maximize();
+  win.show();
+
+  if (!isDev) {
+    createExpressServer();
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  win.loadURL(`http://localhost:${PORT}`);
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
+  if (isDev) {
+    win.webContents.openDevTools({ mode: 'detach' });
   }
+
+  setupLinksLeftClick(win);
+  setupContextMenu(win);
+
+  return win;
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+const assetPath = (asset) => {
+  return path.join(
+    __dirname,
+    isDev ? `../public/${asset}` : `../dist/${asset}`
+  );
+};
 
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+const setupLinksLeftClick = (win) => {
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+};
+
+const setupContextMenu = (win) => {
+  win.webContents.on('context-menu', (_, params) => {
+    const { x, y, linkURL, selectionText } = params;
+
+    const template = [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'pasteAndMatchStyle' },
+      { role: 'delete' },
+      { type: 'separator' },
+      { role: 'selectAll' },
+      { type: 'separator' },
+      { role: 'toggleDevTools' },
+    ];
+
+    const spellingMenu = [];
+
+    if (selectionText && !linkURL) {
+      for (const suggestion of params.dictionarySuggestions) {
+        spellingMenu.push(
+          new MenuItem({
+            label: suggestion,
+            click: () => win.webContents.replaceMisspelling(suggestion),
+          })
+        );
+      }
+
+      if (params.misspelledWord) {
+        spellingMenu.push(
+          new MenuItem({
+            label: 'Add to dictionary',
+            click: () =>
+              win.webContents.session.addWordToSpellCheckerDictionary(
+                params.misspelledWord
+              ),
+          })
+        );
+      }
+
+      if (spellingMenu.length > 0) {
+        spellingMenu.push({ type: 'separator' });
+      }
+
+      template.push(
+        { type: 'separator' },
+        {
+          label: `Search Google for "${selectionText}"`,
+          click: () => {
+            shell.openExternal(
+              `https://www.google.com/search?q=${encodeURIComponent(
+                selectionText
+              )}`
+            );
+          },
+        },
+        {
+          label: `Search DuckDuckGo for "${selectionText}"`,
+          click: () => {
+            shell.openExternal(
+              `https://duckduckgo.com/?q=${encodeURIComponent(selectionText)}`
+            );
+          },
+        }
+      );
+    }
+
+    if (linkURL) {
+      template.push(
+        { type: 'separator' },
+        {
+          label: 'Open Link in Browser',
+          click: () => {
+            shell.openExternal(linkURL);
+          },
+        },
+        {
+          label: 'Copy Link Address',
+          click: () => {
+            clipboard.writeText(linkURL);
+          },
+        },
+        {
+          label: 'Save Link As...',
+          click: () => {
+            dialog.showSaveDialog(
+              win,
+              { defaultPath: path.basename(linkURL) },
+              (filePath) => {
+                if (filePath) {
+                  download(win, linkURL, { filename: filePath });
+                }
+              }
+            );
+          },
+        }
+      );
+    }
+
+    Menu.buildFromTemplate([...spellingMenu, ...template]).popup({
+      window: win,
+      x,
+      y,
+    });
+  });
+};
+
+const createTray = (win) => {
+  const tray = new Tray(assetPath(!process.platform === 'darwin' ? ICON : ICON_TEMPLATE));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show',
+      click: () => {
+        win.maximize();
+        win.show();
+      },
+    },
+    {
+      label: 'Exit',
+      click: () => {
+        app.isQuiting = true;
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.on('click', () => {
+    win.maximize();
+    win.show();
+  });
+  tray.setToolTip('Better ChatGPT');
+  tray.setContextMenu(contextMenu);
+
+  return tray;
+};
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+process.on('uncaughtException', (error) => {
+  dialog.showErrorBox('An error occurred', error.stack);
+  process.exit(1);
+});
+
+if (app) {
+  const instanceLock = app.requestSingleInstanceLock();
+  if (!instanceLock) {
+    app.quit();
+  } else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      if (win) {
+        if (win.isMinimized()) win.restore();
+        win.focus();
+      }
+    });
+
+    app.whenReady().then(createElectronWindow);
+  }
+} else {
+  createExpressServer();
 }
