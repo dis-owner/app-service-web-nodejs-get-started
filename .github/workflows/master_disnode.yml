@@ -20,6 +20,27 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
+          
+      - name: Set up environment variables
+        run: |
+          echo "VITE_CUSTOM_API_ENDPOINT=${{ secrets.VITE_CUSTOM_API_ENDPOINT}}" >> .env
+          echo "VITE_DEFAULT_API_ENDPOINT=${{ secrets.VITE_DEFAULT_API_ENDPOINT}}" >> .env
+          echo "VITE_OPENAI_API_KEY=${{ secrets.VITE_OPENAI_API_KEY}}" >> .env
+          echo "VITE_DATA_PROJECTRESOURCEID=${{ secrets.VITE_DATA_PROJECTRESOURCEID}}" >> .env
+          echo "VITE_DATA_QUERYTYPE=${{ secrets.VITE_DATA_QUERYTYPE}}" >> .env
+          echo "VITE_DATA_ROLEINFORMATION=${{ secrets.VITE_DATA_ROLEINFORMATION}}" >> .env
+          echo "VITE_DATA_ENDPOINT=${{ secrets.VITE_DATA_ENDPOINT}}" >> .env
+          echo "VITE_DATA_KEY=${{ secrets.VITE_DATA_KEY}}" >> .env
+          echo "VITE_DATA_INDEXNAME=${{ secrets.VITE_DATA_INDEXNAME}}" >> .env
+          echo "REACT_APP_AZURE_STORAGE_ACCOUNT_NAME=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" >> .env
+          echo "REACT_APP_AZURE_STORAGE_ACCOUNT_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" >> .env
+          echo "REACT_APP_AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" >> .env
+          echo "VITE_CONTAINER_NAME=${{ secrets.VITE_CONTAINER_NAME }}" >> .env
+          echo "VITE_SAS_TOKEN=${{ secrets.VITE_SAS_TOKENY }}" >> .env
+          echo "VITE_STORAGE_ACCAUNT=${{ secrets.VITE_STORAGE_ACCAUNT }}" >> .env
+      
+      - name: Show .env file
+        run: cat .env
 
       - name: npm install, build, and test
         run: |
@@ -54,27 +75,6 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Set up environment variables
-        run: |
-          echo "VITE_CUSTOM_API_ENDPOINT=${{ secrets.VITE_CUSTOM_API_ENDPOINT}}" >> .env
-          echo "VITE_DEFAULT_API_ENDPOINT=${{ secrets.VITE_DEFAULT_API_ENDPOINT}}" >> .env
-          echo "VITE_OPENAI_API_KEY=${{ secrets.VITE_OPENAI_API_KEY}}" >> .env
-          echo "VITE_DATA_PROJECTRESOURCEID=${{ secrets.VITE_DATA_PROJECTRESOURCEID}}" >> .env
-          echo "VITE_DATA_QUERYTYPE=${{ secrets.VITE_DATA_QUERYTYPE}}" >> .env
-          echo "VITE_DATA_ROLEINFORMATION=${{ secrets.VITE_DATA_ROLEINFORMATION}}" >> .env
-          echo "VITE_DATA_ENDPOINT=${{ secrets.VITE_DATA_ENDPOINT}}" >> .env
-          echo "VITE_DATA_KEY=${{ secrets.VITE_DATA_KEY}}" >> .env
-          echo "VITE_DATA_INDEXNAME=${{ secrets.VITE_DATA_INDEXNAME}}" >> .env
-          echo "REACT_APP_AZURE_STORAGE_ACCOUNT_NAME=${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" >> .env
-          echo "REACT_APP_AZURE_STORAGE_ACCOUNT_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" >> .env
-          echo "REACT_APP_AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" >> .env
-          echo "VITE_CONTAINER_NAME=${{ secrets.VITE_CONTAINER_NAME }}" >> .env
-          echo "VITE_SAS_TOKEN=${{ secrets.VITE_SAS_TOKENY }}" >> .env
-          echo "VITE_STORAGE_ACCAUNT=${{ secrets.VITE_STORAGE_ACCAUNT }}" >> .env
-      
-      - name: Show .env file
-        run: cat .env
-      
       - name: Login to Azure
         uses: azure/login@v1
         with:
