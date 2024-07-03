@@ -39,7 +39,7 @@ const CitationMenu = () => {
 
   //新規追加 20240529
   // コンテナ名
-  const containerName = import.meta.env.VITE_CONTAINER_NAME?? '';
+  const containerName = decodeURI(import.meta.env.VITE_CONTAINER_NAME?? '');
   console.log("containerName"+ containerName);
   // 呼び出したいファイル名
   const blobName = citationContent.title;
