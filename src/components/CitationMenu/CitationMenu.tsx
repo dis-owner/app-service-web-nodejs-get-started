@@ -37,27 +37,27 @@ const CitationMenu = () => {
   };
 
 
-  // //新規追加 20240529
-  // // コンテナ名
-  // const containerName = import.meta.env.VITE_CONTAINER_NAME?? '';
-  // // 呼び出したいファイル名
-  // const blobName = citationContent.title;
-  // console.log("citationContent.title:"+ blobName);
-  // window.Buffer = Buffer;
-  // const sasToken =import.meta.env.VITE_SAS_TOKEN?? '';
-  // const accountUrl =import.meta.env.VITE_STORAGE_ACCAUNT?? '';
+  //新規追加 20240529
+  // コンテナ名
+  const containerName = import.meta.env.VITE_CONTAINER_NAME?? '';
+  // 呼び出したいファイル名
+  const blobName = citationContent.title;
+  console.log("citationContent.title:"+ blobName);
+  window.Buffer = Buffer;
+  const sasToken =import.meta.env.VITE_SAS_TOKEN?? '';
+  const accountUrl =import.meta.env.VITE_STORAGE_ACCAUNT?? '';
   
-  //   // BlobServiceClientを作成
-  //   const blobServiceClient = new BlobServiceClient(`${accountUrl}?${sasToken}`);
-  //   // コンテナクライアントを取得
-  //   const containerClient = blobServiceClient.getContainerClient(containerName);
-  //   // ブロブクライアントを取得
-  //   const blobClient = containerClient.getBlobClient(blobName);
+    // BlobServiceClientを作成
+    const blobServiceClient = new BlobServiceClient(`${accountUrl}?${sasToken}`);
+    // コンテナクライアントを取得
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    // ブロブクライアントを取得
+    const blobClient = containerClient.getBlobClient(blobName);
   
-  //   // ブロブをダウンロード
-  //   const downloadBlockBlobResponse =  blobClient.url;
-  //   console.log("Download response:", downloadBlockBlobResponse);
-  //   //ここまで
+    // ブロブをダウンロード
+    const downloadBlockBlobResponse =  blobClient.url;
+    console.log("Download response:", downloadBlockBlobResponse);
+    //ここまで
 
   return (
     <>
@@ -73,7 +73,7 @@ const CitationMenu = () => {
         <div style={{ padding: '10px' }}>
         
           {/* <ReactMarkdown>{citationContent.content}</ReactMarkdown>*/}
-          {/* <iframe title="Citation" src={downloadBlockBlobResponse} width="100%" height="810px" /> */}
+          <iframe title="Citation" src={downloadBlockBlobResponse} width="100%" height="810px" />
         </div>
 
       </div>
