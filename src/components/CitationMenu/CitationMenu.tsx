@@ -57,6 +57,8 @@ const CitationMenu = () => {
   
     // ブロブをダウンロード
     const downloadBlockBlobResponse =  blobClient.url;
+    const blobDownloadUrl = `${blobClient.url}?${sasToken}`;
+
     console.log("Download response:", downloadBlockBlobResponse);
     //ここまで
 
@@ -74,7 +76,9 @@ const CitationMenu = () => {
         <div style={{ padding: '10px' }}>
         
           {/* <ReactMarkdown>{citationContent.content}</ReactMarkdown>*/}
-          <iframe title="Citation" src={downloadBlockBlobResponse} width="100%" height="810px" />
+          {/* <iframe title="Citation" src={downloadBlockBlobResponse} width="100%" height="810px" /> */}
+          <iframe title="Citation" src={blobDownloadUrl} width="100%" height="810px" />
+          
         </div>
 
       </div>
