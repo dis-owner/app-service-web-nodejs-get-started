@@ -36,7 +36,7 @@ jobs:
           echo "REACT_APP_AZURE_STORAGE_ACCOUNT_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" >> .env
           echo "REACT_APP_AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" >> .env
           echo "VITE_CONTAINER_NAME=${{ secrets.VITE_CONTAINER_NAME }}" >> .env
-          echo "VITE_SAS_TOKEN=${{ secrets.VITE_SAS_TOKENY }}" >> .env
+          echo "VITE_SAS_TOKEN=${{ secrets.VITE_SAS_TOKEN }}" >> .env
           echo "VITE_STORAGE_ACCAUNT=${{ secrets.VITE_STORAGE_ACCAUNT }}" >> .env
       
       - name: Show .env file
