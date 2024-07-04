@@ -46,6 +46,7 @@ const CitationMenu = () => {
   console.log("citationContent.title:"+ blobName);
   window.Buffer = Buffer;
   const sasToken =import.meta.env.VITE_SAS_TOKEN?? '';
+  console.log("sasToken:"+ sasToken);
   const accountUrl =import.meta.env.VITE_STORAGE_ACCAUNT?? '';
   
     // BlobServiceClientを作成
@@ -57,7 +58,7 @@ const CitationMenu = () => {
   
     // ブロブをダウンロード
     const downloadBlockBlobResponse =  blobClient.url;
-    const blobDownloadUrl = `${blobClient.url}?${sasToken}`;
+    const blobDownloadUrl = `${accountUrl}?${sasToken}`;
 
     console.log("Download response:", downloadBlockBlobResponse);
     //ここまで
