@@ -38,6 +38,8 @@ jobs:
           echo "VITE_CONTAINER_NAME=${{ secrets.VITE_CONTAINER_NAME }}" >> .env
           echo "VITE_SAS_TOKEN=${{ secrets.VITE_SAS_TOKEN }}" >> .env
           echo "VITE_STORAGE_ACCAUNT=${{ secrets.VITE_STORAGE_ACCAUNT }}" >> .env
+          echo "VITE_BING_API_ENDPOINT=${{ secrets.VITE_BING_API_ENDPOINT }}" >> .env
+          echo "VITE_BING_API_KEY=${{ secrets.VITE_BING_API_KEY }}" >> .env
       
       - name: Show .env file
         run: cat .env
