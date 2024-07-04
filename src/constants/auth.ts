@@ -5,3 +5,6 @@ export const defaultAPIEndpoint =
   import.meta.env.VITE_DEFAULT_API_ENDPOINT || officialAPIEndpoint;
 
 export const availableEndpoints = [officialAPIEndpoint, customAPIEndpoint];
+
+export const bingAPIEndpoint = import.meta.env.VITE_BING_API_ENDPOINT;
+export const bingAPIKey = import.meta.env.VITE_BING_API_KEY;

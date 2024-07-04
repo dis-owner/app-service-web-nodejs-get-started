@@ -3,6 +3,8 @@ import { useTranslation, Trans } from 'react-i18next';
 import PopupModal from '@components/PopupModal';
 import AboutIcon from '@icon/AboutIcon';
 import FAQPlugin from '@components/AboutMenu/FAQPluginToggle';
+import WebPluginToggle from '@components/AboutMenu/WebPluginToggle'
+
 const AboutMenu = () => {
   const { t } = useTranslation(['main', 'about']);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -32,6 +34,7 @@ const AboutMenu = () => {
                 使用したいプラグインをONにしてください
               </>
               <FAQPlugin/>
+              <WebPluginToggle />
             </div>
           </div>
         </PopupModal>

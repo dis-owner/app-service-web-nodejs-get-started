@@ -139,9 +139,8 @@ const ContentView = memo(
         </div>
         <div>
           {citation?.map((item,index) => (
-            <Citation index={index} title={item.title} content={item.content}></Citation>
+            <Citation key={index} index={index} title={item.title} content={item.content}></Citation>
           ))}
-          
         </div>
         <div className='flex justify-end gap-2 w-full mt-2'>
           {isDelete || (

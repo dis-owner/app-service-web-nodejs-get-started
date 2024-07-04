@@ -21,6 +21,7 @@ export interface ConfigSlice {
   datasourceConfig: DatasourceInterface;
   isCitationMenu: boolean;
   citationContent: CitationInterface;
+  web: boolean;
   setOpenConfig: (openConfig: boolean) => void;
   setTheme: (theme: Theme) => void;
   setAutoTitle: (autoTitle: boolean) => void;
@@ -38,6 +39,7 @@ export interface ConfigSlice {
   setDatasourceConfig: (datasourceConfig: DatasourceInterface) => void
   setIsCitationMenu: (isCitationMenu: boolean) => void;
   setCitationContent: (citationContent: CitationInterface) => void;
+  setWeb: (web: boolean) => void;
 }
 
 export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
@@ -58,6 +60,7 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   datasourceConfig: _defaultDatasourceConfig,
   isCitationMenu: false,
   citationContent: _defaultCitationContent,
+  web: false,
   setOpenConfig: (openConfig: boolean) => {
     set((prev: ConfigSlice) => ({
       ...prev,
@@ -158,6 +161,12 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
     set((prev: ConfigSlice) => ({
       ...prev,
       citationContent: citationContent,
+    }));
+  },
+  setWeb: (web: boolean) =>{
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      web: web
     }));
   }
 });

@@ -63,6 +63,7 @@ export const createPartializedState = (state: StoreState) => ({
   datasourceConfig: state.datasourceConfig,
   isCitationMenu: state.isCitationMenu,
   citationContent: state.citationContent,
+  web: state.web,
 });
 
 const useStore = create<StoreState>()(

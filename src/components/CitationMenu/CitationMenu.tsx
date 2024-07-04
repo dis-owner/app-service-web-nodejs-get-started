@@ -39,14 +39,12 @@ const CitationMenu = () => {
 
   //新規追加 20240529
   // コンテナ名
-  const containerName = decodeURI(import.meta.env.VITE_CONTAINER_NAME?? '');
-  console.log("containerName"+ containerName);
+  const containerName = import.meta.env.VITE_CONTAINER_NAME?? '';
   // 呼び出したいファイル名
   const blobName = citationContent.title;
   console.log("citationContent.title:"+ blobName);
   window.Buffer = Buffer;
   const sasToken =import.meta.env.VITE_SAS_TOKEN?? '';
-  console.log("sasToken:"+ sasToken);
   const accountUrl =import.meta.env.VITE_STORAGE_ACCAUNT?? '';
   
     // BlobServiceClientを作成
@@ -58,8 +56,6 @@ const CitationMenu = () => {
   
     // ブロブをダウンロード
     const downloadBlockBlobResponse =  blobClient.url;
-    //const blobDownloadUrl = `${accountUrl}?${sasToken}`;
-
     console.log("Download response:", downloadBlockBlobResponse);
     //ここまで
 
@@ -78,7 +74,6 @@ const CitationMenu = () => {
         
           {/* <ReactMarkdown>{citationContent.content}</ReactMarkdown>*/}
           <iframe title="Citation" src={downloadBlockBlobResponse} width="100%" height="810px" />
-          
         </div>
 
       </div>

@@ -3,23 +3,23 @@ import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
 import Toggle from '@components/Toggle';
 
-const FAQPluginToggle = () => {
+const WebPluginToggle = () => {
   const { t } = useTranslation();
 
-  const setFaq = useStore((state) => state.setFAQ);
+  const setWeb = useStore((state) => state.setWeb);
 
   const [isChecked, setIsChecked] = useState<boolean>(
-    useStore.getState().faq
+    useStore.getState().web
   );
 
   useEffect(() => {
-    setFaq(isChecked);
+    setWeb(isChecked);
   }, [isChecked]);
 
   return (
     <>
       <Toggle
-        label={t('社内規定FAQプラグイン') as string}
+        label={t('Web検索プラグイン') as string}
         isChecked={isChecked}
         setIsChecked={setIsChecked}
       />
@@ -27,4 +27,4 @@ const FAQPluginToggle = () => {
   );
 };
 
-export default FAQPluginToggle;
+export default WebPluginToggle;
