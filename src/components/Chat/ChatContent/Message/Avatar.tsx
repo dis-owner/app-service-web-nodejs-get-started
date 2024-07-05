@@ -31,7 +31,7 @@ const AssistantAvatar = () => {
       className='relative h-[30px] w-[30px] p-1 rounded-sm text-white flex items-center justify-center'
       style={{ backgroundColor: 'rgb(0, 110, 200)' }}
     >
-      <img src="../../../../../public/シンボルマーク_白.png"></img>
+      <img src="../../../../../public/symbol_write.png"></img>
       {/* <svg
         width='41'
         height='41'
