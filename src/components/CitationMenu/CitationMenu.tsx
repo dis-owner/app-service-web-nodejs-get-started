@@ -42,7 +42,6 @@ const CitationMenu = () => {
   const containerName = import.meta.env.VITE_CONTAINER_NAME?? '';
   // 呼び出したいファイル名
   const blobName = citationContent.title;
-  console.log("citationContent.title:"+ blobName);
   window.Buffer = Buffer;
   const sasToken =import.meta.env.VITE_SAS_TOKEN?? '';
   const accountUrl =import.meta.env.VITE_STORAGE_ACCAUNT?? '';
@@ -56,7 +55,6 @@ const CitationMenu = () => {
   
     // ブロブをダウンロード
     const downloadBlockBlobResponse =  blobClient.url;
-    console.log("Download response:", downloadBlockBlobResponse);
     //ここまで
 
   return (

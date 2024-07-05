@@ -1,10 +1,10 @@
 import React from 'react';
 
-const PersonIcon = () => {
+const AssistantIcon = () => {
   return (
-    <img src="/public/symbol_write.png"></img>
+     <img src="/public/symbol_write.png"/>
 
-    // <svg
+     //<svg
     //   stroke='currentColor'
     //   fill='none'
     //   strokeWidth='2'
@@ -16,10 +16,10 @@ const PersonIcon = () => {
     //   width='1em'
     //   xmlns='http://www.w3.org/2000/svg'
     // >
-    //   <path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path>
-    //   <circle cx='12' cy='7' r='4'></circle>
-    // </svg>
+     //   <path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path>
+    //   <circle cx='12' cy='7' r='4'></circle> */}
+   //</svg>
   );
 };
 
-export default PersonIcon;
+export default AssistantIcon;
