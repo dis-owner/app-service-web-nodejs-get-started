@@ -2,6 +2,7 @@ import React from 'react';
 import { Role } from '@type/chat';
 import SettingIcon from '@icon/SettingIcon';
 import PersonIcon from '@icon/PersonIcon';
+import AssistantIcon from '@icon/AssistantIcon';
 
 
 const Avatar = React.memo(({ role }: { role: Role }) => {
@@ -31,7 +32,7 @@ const AssistantAvatar = () => {
       className='relative h-[30px] w-[30px] p-1 rounded-sm text-white flex items-center justify-center'
       style={{ backgroundColor: 'rgb(0, 110, 200)' }}
     >
-      <img src="../../../../../public/symbol_write.png"></img>
+      <AssistantIcon />
       {/* <svg
         width='41'
         height='41'
