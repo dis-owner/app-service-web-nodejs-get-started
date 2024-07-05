@@ -102,7 +102,7 @@ const ChatHistoryList = () => {
       currentChatIndex < chatTitles.length
     ) {
       // set title
-      document.title = chatTitles[currentChatIndex];
+      //document.title = chatTitles[currentChatIndex];
 
       // expand folder of current chat
       const chats = useStore.getState().chats;
