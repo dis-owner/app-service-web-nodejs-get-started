@@ -15,10 +15,10 @@ const CitationMenu = () => {
     color: 'white',
     fontSize: '14px',
     position: 'fixed',
-    right: isCitationMenu ? '0' : '-300px', // 表示/非表示の位置
+    right: isCitationMenu ? '0' : '-500px', // 表示/非表示の位置
     top: '0',
     height: '100%',
-    width: '300px',
+    width: '500px',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 1000,
     transition: 'right 0.3s', // スライドアニメーション

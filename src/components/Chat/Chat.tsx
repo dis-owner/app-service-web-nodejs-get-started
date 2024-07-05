@@ -14,7 +14,7 @@ const Chat = () => {
     <div
       className={`flex h-full flex-1 flex-col ${
         hideSideMenu ? 'md:pl-0' : 'md:pl-[260px]'
-      } ${isCitationMenu ? 'md:pr-[300px]' : 'md:pr-0'}`} 
+      } ${isCitationMenu ? 'md:pr-[400px]' : 'md:pr-0'}`} 
     >
       <MobileBar />
       

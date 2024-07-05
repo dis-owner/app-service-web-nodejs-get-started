@@ -2,7 +2,7 @@ import React from 'react';
 
 const AssistantIcon = () => {
   return (
-     <img src="/public/symbol_write.png"/>
+     <img src="/symbol_write.png"/>
 
      //<svg
     //   stroke='currentColor'
